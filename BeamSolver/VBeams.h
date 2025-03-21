@@ -20,7 +20,7 @@
 #define ERR_TOLERANCE 0.000000001
 #define RENDER_SCALING_FACTOR 0.1
 
-#define DEBUG_PRINTS
+//#define DEBUG_PRINTS
 
 
 
@@ -135,6 +135,10 @@ namespace Beams {
 				Nodes[pos].x = point.x;
 				Nodes[pos].y = point.y;
 				Nodes[pos].z = point.z;
+				Nodes[pos].xRender = point.x*RENDER_SCALING_FACTOR;
+				Nodes[pos].yRender = point.y*RENDER_SCALING_FACTOR;
+				Nodes[pos].zRender = point.z*RENDER_SCALING_FACTOR;
+
 				Nodes[pos].matrixPos = -1;
 				Nodes[pos].free_flag= true; //extra safety
 
@@ -351,7 +355,7 @@ namespace Beams {
 		};
 
 		void calc_BMatrix(const Section section) {
-
+			localBmatrix.data().clear();
 			float Area = section.Area;
 			float Izz = section.Izz;
 			float Iyy = section.Iyy;
@@ -459,8 +463,8 @@ namespace Beams {
 			calc_BMatrix(section);
 		};
 
-		void reCalc(std::vector<Node>& Nodes, const Section& section) {
-			calc_Len(Nodes[node2Pos], Nodes[node1Pos]);
+		void reCalc(NodeContainer& Nodes, const Section& section) {
+			calc_Len(Nodes.get_byPos(node2Pos), Nodes.get_byPos(node1Pos));
 			calc_BMatrix(section);
 		}
 
@@ -649,7 +653,7 @@ namespace Beams {
 
 
 			Elements.emplace_back(eId_Last, Nodes.get_byPos(n1Pos), Nodes.get_byPos(n2Pos), Nodes.get_byPos(n3Pos), sectionID, Sections[sectionID]);
-
+			Sections[sectionID].inElements.emplace_back(eId_Last);
 
 			//get whether the element's nodes were not used in the stifness matrix
 			bool n1Free = Nodes.getFree_fromAll(n1Pos);
@@ -1075,7 +1079,9 @@ namespace Beams {
 
 		void modifySection(const size_t Id, float _Area, float _Modulus, float _G, float _Ixx, float _Iyy, float _Izz) {
 			auto it = Sections.find(Id);
+
 			if (it != Sections.end()) {
+				solved = false;
 				Section& sec = it->second;
 				
 				sec.Area = _Area;
@@ -1084,6 +1090,11 @@ namespace Beams {
 				sec.Iyy = (_Iyy < 0) ? _Izz : _Iyy;
 				sec.Modulus = _Modulus;
 				sec.G = _G;
+				for (auto& element : Elements) {
+					if (std::find(sec.inElements.begin(), sec.inElements.end(), element.getID()) != sec.inElements.end()) {
+						element.reCalc(Nodes, sec);
+					}
+				}
 			}
 		}
 	};
