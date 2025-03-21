@@ -127,7 +127,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\external\raylib-master\src;..\external\raylib-master\src\external;$(SolutionDir)\eigen-3.4.0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\external\raylib-master\src;..\external\raylib-master\src\external;$(SolutionDir)\external\eigen-3.4.0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,9 +141,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CubeExampleRaygui.h" />
     <ClInclude Include="drawing.h" />
-    <ClInclude Include="PointOctree.h" />
     <ClInclude Include="VBeams.h" />
   </ItemGroup>
   <ItemGroup>
